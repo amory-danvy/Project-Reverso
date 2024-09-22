@@ -17,6 +17,7 @@ SCALE_SPEED = 0.1
 TITLE_SCALE_SPEED = 0.003
 FONT_PATH = 'Font/Stimcard.ttf'  # Path to the custom font
 POP_SOUND_PATH = 'Audio/pop.wav'  # Path to the pop sound effect
+MENU_SOUND_PATH = 'Audio/GmodSpawn.wav' # Path to the menu sound effect
 BACKGROUND_MUSIC_PATH = 'Audio/background_music.mp3'  # Path to the background music
 
 # Pygame Initialization
@@ -32,6 +33,13 @@ try:
 except pygame.error:
     print(f"Error: Sound file '{POP_SOUND_PATH}' not found.")
     pop_sound = None  # Set to None if loading fails to prevent crashes
+    
+# Load menu sound effect
+try:
+    menu_sound = pygame.mixer.Sound(MENU_SOUND_PATH)
+except pygame.error:
+    print(f"Error: Sound file '{MENU_SOUND_PATH}' not found.")
+    menu_sound = None  # Set to None if loading fails to prevent crashes
 
 # Load and play background music
 try:
@@ -62,10 +70,12 @@ def draw_text(surface, text, pos, font_size, scale=1):
 def menu_principal():
     """Displays the main menu to choose difficulty with mouse interaction."""
     options = [
-        {"text": "1. Facile (6x6)", "rect": pygame.Rect(200, 170, 200, 50), "scale": NORMAL_SCALE, "difficulty": FACILE},
-        {"text": "2. Moyen (9x9)", "rect": pygame.Rect(200, 220, 200, 50), "scale": NORMAL_SCALE, "difficulty": MOYEN},
-        {"text": "3. Difficile (12x12)", "rect": pygame.Rect(200, 270, 200, 50), "scale": NORMAL_SCALE, "difficulty": DIFFICILE},
+        {"text": "Easy (6x6)", "rect": pygame.Rect(200, 177, 200, 50), "scale": NORMAL_SCALE, "difficulty": FACILE},
+        {"text": "Medium (9x9)", "rect": pygame.Rect(200, 228, 200, 50), "scale": NORMAL_SCALE, "difficulty": MOYEN},
+        {"text": "Hard (12x12)", "rect": pygame.Rect(200, 280, 200, 50), "scale": NORMAL_SCALE, "difficulty": DIFFICILE},
     ]
+    
+    sound_played = False  # Variable pour suivre si le son a déjà été joué
 
     while True:
         title_screen.fill(BLACK)
@@ -77,10 +87,18 @@ def menu_principal():
         for option in options:
             if option["rect"].collidepoint(mouse_pos):
                 option["scale"] = min(MAX_SCALE, option["scale"] + SCALE_SPEED)
+                
+                if menu_sound and not sound_played:  # Vérifie si le son n'a pas encore été joué
+                    menu_sound.play()
+                    sound_played = True  # Marque que le son a été joué
+
                 if mouse_clicked:
                     return option["difficulty"]
             else:
                 option["scale"] = max(NORMAL_SCALE, option["scale"] - SCALE_SPEED)
+
+            # Réinitialise sound_played après avoir vérifié tous les rectangles
+            sound_played = False if not any(option["rect"].collidepoint(mouse_pos) for option in options) else sound_played
 
             draw_text(title_screen, option["text"], option["rect"].center, BASE_FONT_SIZE, option["scale"])
 
@@ -139,7 +157,7 @@ TAILLE_CASE = LARG_FEN // N
 # Initialize the window and board
 plateau = init_alea_plateau(N)
 f = pygame.display.set_mode((LARG_FEN, HAUT_FEN))
-pygame.display.set_caption("Jeu de Cercles")
+pygame.display.set_caption("Reverso ")
 
 # Main Program
 affiche_plateau(plateau, f, TAILLE_CASE)

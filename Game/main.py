@@ -67,6 +67,7 @@ def draw_text(surface, text, pos, font_size, scale=1):
     text_surface = font.render(text, True, WHITE)
     surface.blit(text_surface, text_surface.get_rect(center=pos))
 
+
 def menu_principal():
     """Displays the main menu to choose difficulty with mouse interaction."""
     options = [
@@ -75,8 +76,8 @@ def menu_principal():
         {"text": "Hard (12x12)", "rect": pygame.Rect(200, 280, 200, 50), "scale": NORMAL_SCALE, "difficulty": DIFFICILE},
     ]
     
-    sound_played = False  # Variable pour suivre si le son a déjà été joué
-
+    prev_option = None
+    
     while True:
         title_screen.fill(BLACK)
         anime_title(title_screen, "Reverso", (300, 100), pygame.time.get_ticks())
@@ -88,17 +89,15 @@ def menu_principal():
             if option["rect"].collidepoint(mouse_pos):
                 option["scale"] = min(MAX_SCALE, option["scale"] + SCALE_SPEED)
                 
-                if menu_sound and not sound_played:  # Vérifie si le son n'a pas encore été joué
+                if menu_sound and (prev_option != option):
                     menu_sound.play()
-                    sound_played = True  # Marque que le son a été joué
-
+                    prev_option = option
+                    
                 if mouse_clicked:
                     return option["difficulty"]
             else:
                 option["scale"] = max(NORMAL_SCALE, option["scale"] - SCALE_SPEED)
-
-            # Réinitialise sound_played après avoir vérifié tous les rectangles
-            sound_played = False if not any(option["rect"].collidepoint(mouse_pos) for option in options) else sound_played
+                
 
             draw_text(title_screen, option["text"], option["rect"].center, BASE_FONT_SIZE, option["scale"])
 

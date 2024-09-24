@@ -2,8 +2,8 @@
 
 # Difficulty Levels
 EASY = (6, 480, 480)
-MEDIUM = (9, 720, 720)
-HARD = (12, 960, 960)
+MEDIUM = (9, 480, 480)
+HARD = (12, 480, 480)
 
 # Colors
 WHITE = (255, 255, 255)
